@@ -1,0 +1,13 @@
+{
+    "name": "pie_chart",
+    "arguments": {
+        "data": [
+            {"name": "Jan", "value": 200},
+            {"name": "Feb", "value": 700},
+            {"name": "Mar", "value": 500},
+            {"name": "Abr", "value": 500},
+            {"name": "May", "value": 100}
+        ]
+    }
+}
+

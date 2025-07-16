@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        destination:
+          - "platform=iOS Simulator,name=iPhone 15 Pro,OS=latest"
+          - "platform=macOS,arch=arm64"
+          - "platform=tvOS Simulator,name=Apple TV 4K (3rd generation),OS=latest"
+          - "platform=watchOS Simulator,name=Apple Watch Series 9 (45mm),OS=latest"
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Select Xcode version
+      run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+      
+    - name: Show Xcode version
+      run: xcodebuild -version
+      
+    - name: Show available destinations
+      run: xcodebuild -showdestinations -scheme AIDUIKit -destination generic/platform=iOS
+      
+    - name: Build and Test
+      run: |
+        set -o pipefail
+        xcodebuild \
+          -scheme AIDUIKit \
+          -destination "${{ matrix.destination }}" \
+          -enableCodeCoverage YES \
+          -resultBundlePath TestResults \
+          build test | xcpretty
+      
+  swift-test:
+    name: Swift Package Manager Tests
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Test with SPM
+      run: swift test --enable-code-coverage
+      
+    - name: Generate code coverage report
+      run: |
+        xcrun llvm-cov export \
+          .build/debug/AIDUIKitPackageTests.xctest/Contents/MacOS/AIDUIKitPackageTests \
+          -instr-profile .build/debug/codecov/default.profdata \
+          -format="lcov" > coverage.lcov
+          
+  linux-test:
+    name: Linux Tests
+    runs-on: ubuntu-latest
+    container: swift:5.10
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Test on Linux
+      run: swift test
+
+  swiftlint:
+    name: SwiftLint
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: SwiftLint
+      uses: norio-nomura/action-swiftlint@3.2.1
+      with:
+        args: --strict 

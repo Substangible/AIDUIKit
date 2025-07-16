@@ -1,0 +1,13 @@
+{
+    "name": "line_chart",
+    "arguments": {
+        "title": "Sleep Data",
+        "data": [
+            {"xValue": "Jan", "yValue": 200},
+            {"xValue": "Feb", "yValue": 700},
+            {"xValue": "Mar", "yValue": 500},
+            {"xValue": "Abr", "yValue": 500}
+        ]
+    }
+}
+
